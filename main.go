@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/go-kit/kit/endpoint"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -84,13 +85,31 @@ func main() {
 			"bensim_service_name": name,
 		},
 	}, nil)
-	requestLatency := kitprometheus.NewHistogramFrom(stdprometheus.HistogramOpts{
+	latencyCounter := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 		Namespace: "ben_base",
 		Subsystem: subsystem,
-		Name:      "request_latency",
-		Help:      "Total duration of requests in microseconds.",
+		Name:      "latency_counter",
+		Help:      "Processing time taken of requests in seconds, as counter.",
+		ConstLabels: map[string]string{
+			"bensim_service_name": name,
+		},
+	}, nil)
+	latencyHistogram := kitprometheus.NewHistogramFrom(stdprometheus.HistogramOpts{
+		Namespace: "ben_base",
+		Subsystem: subsystem,
+		Name:      "latency_histogram",
+		Help:      "Processing time taken of requests in seconds, as histogram.",
 		// TODO: determine appropriate buckets
 		Buckets: []float64{.0002, .001, .005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10, 15, 25},
+		ConstLabels: map[string]string{
+			"bensim_service_name": name,
+		},
+	}, nil)
+	throughput := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Namespace: "ben_base",
+		Subsystem: subsystem,
+		Name:      "throughput",
+		Help:      "Size of data transmitted in bytes.",
 		ConstLabels: map[string]string{
 			"bensim_service_name": name,
 		},
@@ -139,12 +158,18 @@ func main() {
 		netLoad:     netLoad,
 	}
 	svc = loggingMiddleware(logger)(svc)
-	svc = instrumentingMiddleware(requestCount, requestLatency, logger)(svc)
+	svc = instrumentingMiddleware(requestCount, latencyCounter, latencyHistogram, logger)(svc)
 
 	baseHandler := httptransport.NewServer(
 		makeBaseEndPoint(svc),
 		decodeBaseRequest,
 		encodeResponse,
+		// Request throughput instrumentation
+		httptransport.ServerFinalizer(func(ctx context.Context, code int, r *http.Request){
+			responseSize := ctx.Value(httptransport.ContextKeyResponseSize).(int64)
+			logger.Log("reponse_size", responseSize)
+			throughput.Add(float64(responseSize))
+		}),
 	)
 
 	http.Handle("/", baseHandler)
