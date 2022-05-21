@@ -35,6 +35,7 @@ func main() {
 		workloadDelayTimeEnvKey   = "BEN_WORKLOAD_DELAY_TIME"
 		workloadDelayJitterEnvKey = "BEN_WORKLOAD_DELAY_JITTER"
 		workloadNetEnvKey         = "BEN_WORKLOAD_NET"
+		workloadMemoryEnvKey      = "BEN_WORKLOAD_MEMORY"
 	)
 
 	// -------------------
@@ -53,12 +54,14 @@ func main() {
 		cpuLoad     int
 		ioLoad      int
 		netLoad     int
+		memLoad     int
 	)
 	delayTime, _ = getEnvInt(workloadDelayTimeEnvKey, 0)
 	delayJitter, _ = getEnvInt(workloadDelayJitterEnvKey, delayTime/10)
 	cpuLoad, _ = getEnvInt(workloadCPUEnvKey, 0)
 	ioLoad, _ = getEnvInt(workloadIOEnvKey, 0)
 	netLoad, _ = getEnvInt(workloadNetEnvKey, 0)
+	memLoad, _ = getEnvInt(workloadMemoryEnvKey, 0)
 
 	logger.Log("delay time", delayTime)
 	logger.Log("delay jitter", delayJitter)
@@ -144,6 +147,10 @@ func main() {
 
 	// Seed random number generator
 	rand.Seed(time.Now().UnixNano())
+
+	// Simulate memory allocation
+	memBlock := allocMemory(memLoad)
+	_ = memBlock
 
 	// -------------------
 	// Create & run service

@@ -13,7 +13,8 @@ import (
 
 const (
 	cpuOpsBase = 16384 * 2 // stress-ng use 16384 as a minimal sqrt(rand()) unit
-	ioOpsBase = 64 // 64 times * 1 KiB = 64 KiB
+	ioOpsBase = 64 // 64 times * 1 KB = 64 KB
+	memoryCountBase = 256 * 1024 // int64 = 8 bytes, 8 bytes * 256 * 1024 = 1 MB
 )
 
 // Main stressing entry
@@ -109,4 +110,9 @@ func ioStress(ioLoad int) {
 	log.Printf("io load amount: %d, bytes to write: %d, total bytes written: %d\n", ioLoad, ioOpsBase * 8 * 128, totalBytes)
 }
 
-// TODO: Implement memory(malloc) stressing
+// Allocate memory of given size in MB
+func allocMemory(size int) *[]int64 {
+	object := make([]int64, size * memoryCountBase, size * memoryCountBase)
+	log.Printf("mem alloc: %d int64 summing up to %d MB is allocated.\n", size * memoryCountBase, size)
+	return &object
+}
