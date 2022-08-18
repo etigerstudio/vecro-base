@@ -58,7 +58,7 @@ func cpuStress(cpuLoad int) {
 func ioStress(ioLoad int) {
 	defer printElapsedTime("io-stress")()
 
-	filename := "/tmp/ben_base_stress_" + strconv.FormatUint(rand.Uint64(), 10)
+	filename := "/tmp/vecro_base_stress_" + strconv.FormatUint(rand.Uint64(), 10)
 	f, err := os.Create(filename)
 	if err != nil {
 		panic(err)

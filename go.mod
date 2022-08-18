@@ -1,4 +1,4 @@
-module ben-base
+module vecro-base
 
 go 1.17
 

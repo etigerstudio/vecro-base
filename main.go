@@ -22,20 +22,20 @@ func main() {
 	// Declare constants
 	// -------------------
 	const (
-		nameEnvKey          = "BEN_NAME"
-		subsystemEnvKey     = "BEN_SUBSYSTEM"
-		listenAddressEnvKey = "BEN_LISTEN_ADDRESS"
-		callEnvKey          = "BEN_CALLS"
+		nameEnvKey          = "VECRO_NAME"
+		subsystemEnvKey     = "VECRO_SUBSYSTEM"
+		listenAddressEnvKey = "VECRO_LISTEN_ADDRESS"
+		callEnvKey          = "VECRO_CALLS"
 		callSeparator       = " "
 	)
 
 	const (
-		workloadCPUEnvKey         = "BEN_WORKLOAD_CPU"
-		workloadIOEnvKey          = "BEN_WORKLOAD_IO"
-		workloadDelayTimeEnvKey   = "BEN_WORKLOAD_DELAY_TIME"
-		workloadDelayJitterEnvKey = "BEN_WORKLOAD_DELAY_JITTER"
-		workloadNetEnvKey         = "BEN_WORKLOAD_NET"
-		workloadMemoryEnvKey      = "BEN_WORKLOAD_MEMORY"
+		workloadCPUEnvKey         = "VECRO_WORKLOAD_CPU"
+		workloadIOEnvKey          = "VECRO_WORKLOAD_IO"
+		workloadDelayTimeEnvKey   = "VECRO_WORKLOAD_DELAY_TIME"
+		workloadDelayJitterEnvKey = "VECRO_WORKLOAD_DELAY_JITTER"
+		workloadNetEnvKey         = "VECRO_WORKLOAD_NET"
+		workloadMemoryEnvKey      = "VECRO_WORKLOAD_MEMORY"
 	)
 
 	// -------------------
@@ -80,41 +80,41 @@ func main() {
 	// Init Prometheus counter & histogram
 	// -------------------
 	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
-		Namespace: "ben_base",
+		Namespace: "vecro_base",
 		Subsystem: subsystem,
 		Name:      "request_count",
 		Help:      "Number of requests received.",
 		ConstLabels: map[string]string{
-			"bensim_service_name": name,
+			"vecrosim_service_name": name,
 		},
 	}, nil)
 	latencyCounter := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
-		Namespace: "ben_base",
+		Namespace: "vecro_base",
 		Subsystem: subsystem,
 		Name:      "latency_counter",
 		Help:      "Processing time taken of requests in seconds, as counter.",
 		ConstLabels: map[string]string{
-			"bensim_service_name": name,
+			"vecrosim_service_name": name,
 		},
 	}, nil)
 	latencyHistogram := kitprometheus.NewHistogramFrom(stdprometheus.HistogramOpts{
-		Namespace: "ben_base",
+		Namespace: "vecro_base",
 		Subsystem: subsystem,
 		Name:      "latency_histogram",
 		Help:      "Processing time taken of requests in seconds, as histogram.",
 		// TODO: determine appropriate buckets
 		Buckets: []float64{.0002, .001, .005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10, 15, 25},
 		ConstLabels: map[string]string{
-			"bensim_service_name": name,
+			"vecrosim_service_name": name,
 		},
 	}, nil)
 	throughput := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
-		Namespace: "ben_base",
+		Namespace: "vecro_base",
 		Subsystem: subsystem,
 		Name:      "throughput",
 		Help:      "Size of data transmitted in bytes.",
 		ConstLabels: map[string]string{
-			"bensim_service_name": name,
+			"vecrosim_service_name": name,
 		},
 	}, nil)
 

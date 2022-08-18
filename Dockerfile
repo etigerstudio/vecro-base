@@ -1,4 +1,4 @@
 FROM alpine:3.14
-COPY ben-base /
+COPY vecro-base /
 WORKDIR /
-ENTRYPOINT ["./ben-base"]
+ENTRYPOINT ["./vecro-base"]
