@@ -156,7 +156,7 @@ func main() {
 	// Create & run service
 	// -------------------
 	var svc BaseService
-	svc = baseService{
+	svc = &baseService{
 		calls:       calls,
 		delayTime:   delayTime,
 		delayJitter: delayJitter,
@@ -178,9 +178,15 @@ func main() {
 			throughput.Add(float64(responseSize))
 		}),
 	)
+	setDelayHandler := httptransport.NewServer(
+		makeSetDelayEndPoint(svc),
+		decodeSetDelayRequest,
+		encodeResponse,
+	)
 
 	http.Handle("/", baseHandler)
 	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/set-delay", setDelayHandler)
 	logger.Log("msg", "HTTP", "addr", listenAddress)
 	logger.Log("err", http.ListenAndServe(listenAddress, nil))
 }

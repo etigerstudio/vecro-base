@@ -42,3 +42,24 @@ func encodeRequest(_ context.Context, r *http.Request, request interface{}) erro
 type baseResponse struct {
 	Payload string `json:"payload"`
 }
+
+type setDelayRequest struct {
+	DelayTime int `json:"delay"`
+	DelayJitter int `json:"jitter"`
+}
+
+func decodeSetDelayRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request setDelayRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	return request, nil
+}
+
+func makeSetDelayEndPoint(svc BaseService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(setDelayRequest)
+		payload, err := svc.SetDelay(req.DelayTime, req.DelayJitter)
+		return baseResponse{Payload: payload}, err
+	}
+}
